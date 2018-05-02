@@ -12,8 +12,6 @@ provider:
   stage: ${opt:stage, 'dev'}
   apiKeys:
     - apikey-${self:provider.stage}
-  environment:
-    OWNER_EMAIL: user@domain.com
 
 functions:
   new:

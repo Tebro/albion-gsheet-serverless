@@ -159,7 +159,6 @@ const insertDataToSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string,
 
 
 const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string> => {
-  const OWNER_EMAIL = process.env.OWNER_EMAIL;
 
   const jwtCreds = await getAuthorizedJWT();
 
@@ -183,12 +182,13 @@ const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string>
     }
   })).data;
 
-  await insertDataToSpreadsheet(sheetsApi, spreadsheet.spreadsheetId, JSON.parse(event.body) as SavageDataInput); 
+  const input: SavageDataInput = JSON.parse(event.body);
 
-  await setFileOwner(driveApi, spreadsheet.spreadsheetId, OWNER_EMAIL);
+  await insertDataToSpreadsheet(sheetsApi, spreadsheet.spreadsheetId, input);
+
+  await setFileOwner(driveApi, spreadsheet.spreadsheetId, input.email);
 
   return spreadsheet.spreadsheetUrl;
-
 };
 
 

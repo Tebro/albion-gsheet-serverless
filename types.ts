@@ -46,5 +46,6 @@ export interface SavageDataInput {
   avg: AvgDataTopic;
   members: MemberDataTopic;
   solo: SoloDataTopic;
+  email: string;
 }
 
