@@ -194,14 +194,6 @@ const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string>
 
 export const newSpreadsheet: Handler = (event: APIGatewayEvent, context: Context, cb: Callback) => {
 
-  if (event.headers["X-SECRET"] !== process.env.X_SECRET) {
-    cb(null, {
-      statusCode: 401,
-      body: JSON.stringify({message: "Access Denied"})
-    });
-    return;
-  }
-
   createAndFillSpreadSheet(event)
     .then((url) => {
       cb(null, {

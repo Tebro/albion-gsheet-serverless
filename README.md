@@ -12,4 +12,6 @@ A simple POST endpoint...
 - Deploy `sls deploy`
 
 
-The install process will output the POST endpoints URL. The types.ts file can be used for reference on correct data structure for JSON.
+The install process will output the POST endpoints URL and the api key (use as `x-api-key` http header).
+
+The types.ts file can be used for reference on correct data structure for JSON.

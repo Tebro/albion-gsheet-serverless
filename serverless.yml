@@ -9,9 +9,11 @@ provider:
   name: aws
   runtime: nodejs6.10
   region: eu-west-1
+  stage: ${opt:stage, 'dev'}
+  apiKeys:
+    - apikey-${self:provider.stage}
   environment:
     OWNER_EMAIL: user@domain.com
-    X_SECRET: foobarsuperspecial
 
 functions:
   new:
@@ -21,3 +23,4 @@ functions:
       - http:
           method: post
           path: new
+          private: true
