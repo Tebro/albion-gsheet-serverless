@@ -8,7 +8,7 @@ A simple POST endpoint...
 - Install and configure AWS CLI `pip install awscli; aws configure`
 - Edit the serverless.yml file to your liking
 - Install dependencies `yarn install`
-- Log into google cloud console and create a service account and download credentials for it to ./auth.json
+- Log into google cloud console and create a service account and download credentials for it to ./auth.json (remember to enable the google sheets and google drive APIs as well.)
 - Deploy `sls deploy`
 
 
