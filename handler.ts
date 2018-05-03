@@ -172,11 +172,8 @@ const createNewSpreadsheet = async (sheetsApi: Sheets): Promise<Schema$Spreadshe
 
 const mergeCells = async (sheetsApi: Sheets,
   spreadsheetId: string,
-  startRow: number,
-  endRow: number,
-  startColumn: number,
-  endColumn: number,
-  mergeType: string): Promise<void> => {
+  range: CellRange,
+  mergeType: MergeType): Promise<void> => {
 
     await sheetsApi.spreadsheets.batchUpdate({
       spreadsheetId,
@@ -186,10 +183,10 @@ const mergeCells = async (sheetsApi: Sheets,
             mergeCells: {
               range: {
                 sheetId: 0,
-                startRowIndex: startRow,
-                endRowIndex: endRow,
-                startColumnIndex: startColumn,
-                endColumnIndex: endColumn
+                startRowIndex: range.startRow,
+                endRowIndex: range.endRow,
+                startColumnIndex: range.startColumn,
+                endColumnIndex: range.endColumn
               },
               mergeType: mergeType
             }
@@ -199,10 +196,27 @@ const mergeCells = async (sheetsApi: Sheets,
     });
 }
 
+enum MergeType {
+  MERGE_ALL = "MERGE_ALL",
+  MERGE_COLUMNS = "MERGE_COLUMNS",
+  MERGE_ROWS = "MERGE_ROWS"
+}
+
+interface CellRange {
+  startRow: number;
+  endRow: number;
+  startColumn: number;
+  endColumn: number;
+}
+
 const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Promise<void> => {
-  await mergeCells(sheetsApi, spreadsheetId, 0, 1, 0, 8, "MERGE_ALL");
-  await mergeCells(sheetsApi, spreadsheetId, 0, 1, 9, 16, "MERGE_ALL");
-  await mergeCells(sheetsApi, spreadsheetId, 6, 7, 0, 8, "MERGE_ALL");
+  const avgHeaderRange: CellRange = {startRow: 0, endRow: 1, startColumn: 0, endColumn: 8}; 
+  const membersHeaderRange: CellRange = {startRow: 0, endRow: 1, startColumn: 9, endColumn: 16}; 
+  const soloHeaderRange: CellRange = {startRow: 6, endRow: 7, startColumn: 0, endColumn: 8}; 
+
+  await mergeCells(sheetsApi, spreadsheetId, avgHeaderRange, MergeType.MERGE_ALL);
+  await mergeCells(sheetsApi, spreadsheetId, membersHeaderRange, MergeType.MERGE_ALL);
+  await mergeCells(sheetsApi, spreadsheetId, soloHeaderRange, MergeType.MERGE_ALL);
 }
 
 const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string> => {
