@@ -269,13 +269,19 @@ const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Prom
   await mergeCells(sheetsApi, spreadsheetId, membersHeaderRange, MergeType.MERGE_ALL);
   await mergeCells(sheetsApi, spreadsheetId, soloHeaderRange, MergeType.MERGE_ALL);
 
+
+  const avgHeaderWithColumnHeadersRange: CellRange = {startRowIndex: 0, endRowIndex: 2, startColumnIndex: 0, endColumnIndex: 8};
+  const membersHeaderWithColumnHeadersRange: CellRange = {startRowIndex: 6, endRowIndex: 8, startColumnIndex: 0, endColumnIndex: 8};
+  const soloHeaderWithColumnHeadersRange: CellRange = {startRowIndex: 0, endRowIndex: 2, startColumnIndex: 9, endColumnIndex: 16};
+
+
   const avgHeaderColor: CellColor = {red: 0.3, blue: 0.3, green: 0.8};
   const membersHeaderColor: CellColor = {red: 0.3, blue: 0.8, green: 0.3};
   const soloHeaderColor: CellColor = {red: 0.6, blue: 0.6, green: 0.3};
 
-  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, avgHeaderRange, avgHeaderColor, "CENTER", "MIDDLE");
-  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, membersHeaderRange, membersHeaderColor, "CENTER", "MIDDLE");
-  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, soloHeaderRange, soloHeaderColor, "CENTER", "MIDDLE");
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, avgHeaderWithColumnHeadersRange, avgHeaderColor, "CENTER", "MIDDLE");
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, membersHeaderWithColumnHeadersRange, membersHeaderColor, "CENTER", "MIDDLE");
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, soloHeaderWithColumnHeadersRange, soloHeaderColor, "CENTER", "MIDDLE");
 
 }
 
