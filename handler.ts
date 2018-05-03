@@ -34,6 +34,19 @@ const setFileOwner = async (driveApi: Drive, fileId: string, email: string): Pro
       transferOwnership: true
     });
 }
+const removeServiceAccountPermission = async (driveApi: Drive, fileId: string): Promise<void> => {
+  const permissions = (await driveApi.permissions.list({
+    fileId
+  })).data;
+
+  const serviceAccountPermssion = permissions.permissions.filter(p => p.role !== 'owner');
+
+  await driveApi.permissions.delete({
+    fileId,
+    permissionId: serviceAccountPermssion[0].id
+  });
+
+}
 
 const getValueArraysForAvg = (data: AvgDataTopic): any => {
   const res = [
@@ -289,6 +302,8 @@ const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string>
   await formatSpreadsheet(sheetsApi, spreadsheet.spreadsheetId);
 
   await setFileOwner(driveApi, spreadsheet.spreadsheetId, input.email);
+
+  await removeServiceAccountPermission(driveApi, spreadsheet.spreadsheetId);
 
   return spreadsheet.spreadsheetUrl;
 };
