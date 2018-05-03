@@ -274,10 +274,9 @@ const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Prom
   const membersHeaderWithColumnHeadersRange: CellRange = {startRowIndex: 6, endRowIndex: 8, startColumnIndex: 0, endColumnIndex: 8};
   const soloHeaderWithColumnHeadersRange: CellRange = {startRowIndex: 0, endRowIndex: 2, startColumnIndex: 9, endColumnIndex: 16};
 
-
-  const avgHeaderColor: CellColor = {red: 0.3, blue: 0.3, green: 0.8};
-  const membersHeaderColor: CellColor = {red: 0.3, blue: 0.8, green: 0.3};
-  const soloHeaderColor: CellColor = {red: 0.6, blue: 0.6, green: 0.3};
+  const avgHeaderColor: CellColor = {red: 0.843, blue: 0.741, green: 0.894};
+  const membersHeaderColor: CellColor = {red: 0.725, blue: 0.898, green: 0.803};
+  const soloHeaderColor: CellColor = {red: 0.8, blue: 0.854, green: 0.757};
 
   await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, avgHeaderWithColumnHeadersRange, avgHeaderColor, "CENTER", "MIDDLE");
   await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, membersHeaderWithColumnHeadersRange, membersHeaderColor, "CENTER", "MIDDLE");
