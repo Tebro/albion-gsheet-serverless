@@ -183,10 +183,7 @@ const mergeCells = async (sheetsApi: Sheets,
             mergeCells: {
               range: {
                 sheetId: 0,
-                startRowIndex: range.startRow,
-                endRowIndex: range.endRow,
-                startColumnIndex: range.startColumn,
-                endColumnIndex: range.endColumn
+                ...range
               },
               mergeType: mergeType
             }
@@ -202,21 +199,71 @@ enum MergeType {
   MERGE_ROWS = "MERGE_ROWS"
 }
 
+interface CellColor {
+  red: number;
+  blue: number;
+  green: number;
+}
+
 interface CellRange {
-  startRow: number;
-  endRow: number;
-  startColumn: number;
-  endColumn: number;
+  startRowIndex: number;
+  endRowIndex: number;
+  startColumnIndex: number;
+  endColumnIndex: number;
+}
+
+
+const setCellBackgroundAndAlignment = async (sheetsApi: Sheets,
+  spreadsheetId: string,
+  range: CellRange,
+  color: CellColor,
+  horizontalAlignment: string = "",
+  verticalAlignment: string = ""): Promise<void> => {
+
+    await sheetsApi.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            repeatCell: {
+              range: {
+                sheetId: 0,
+                ...range
+              },
+              cell: {
+                userEnteredFormat: {
+                  backgroundColor: {
+                    ...color
+                  },
+                  horizontalAlignment,
+                  verticalAlignment
+                }
+              },
+              fields: "userEnteredFormat(backgroundColor, horizontalAlignment, verticalAlignment)"
+            }
+          }
+        ]
+      }
+    });
 }
 
 const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Promise<void> => {
-  const avgHeaderRange: CellRange = {startRow: 0, endRow: 1, startColumn: 0, endColumn: 8}; 
-  const membersHeaderRange: CellRange = {startRow: 0, endRow: 1, startColumn: 9, endColumn: 16}; 
-  const soloHeaderRange: CellRange = {startRow: 6, endRow: 7, startColumn: 0, endColumn: 8}; 
+  const avgHeaderRange: CellRange = {startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 8};
+  const membersHeaderRange: CellRange = {startRowIndex: 0, endRowIndex: 1, startColumnIndex: 9, endColumnIndex: 16};
+  const soloHeaderRange: CellRange = {startRowIndex: 6, endRowIndex: 7, startColumnIndex: 0, endColumnIndex: 8};
 
   await mergeCells(sheetsApi, spreadsheetId, avgHeaderRange, MergeType.MERGE_ALL);
   await mergeCells(sheetsApi, spreadsheetId, membersHeaderRange, MergeType.MERGE_ALL);
   await mergeCells(sheetsApi, spreadsheetId, soloHeaderRange, MergeType.MERGE_ALL);
+
+  const avgHeaderColor: CellColor = {red: 0.3, blue: 0.3, green: 0.8};
+  const membersHeaderColor: CellColor = {red: 0.3, blue: 0.8, green: 0.3};
+  const soloHeaderColor: CellColor = {red: 0.6, blue: 0.6, green: 0.3};
+
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, avgHeaderRange, avgHeaderColor, "CENTER", "MIDDLE");
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, membersHeaderRange, membersHeaderColor, "CENTER", "MIDDLE");
+  await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, soloHeaderRange, soloHeaderColor, "CENTER", "MIDDLE");
+
 }
 
 const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string> => {
