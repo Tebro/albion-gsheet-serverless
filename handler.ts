@@ -157,6 +157,17 @@ const insertDataToSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string,
   });
 }
 
+const createNewSpreadsheet = async (sheetsApi: Sheets): Promise<Schema$Spreadsheet> => {
+  const today = new Date();
+
+  return (await sheetsApi.spreadsheets.create({
+    resource: {
+      properties: {
+        title: `AlbionStats-${today.getFullYear()}-${today.getMonth()}-${today.getUTCDate()}-${today.getTime()}`
+      }
+    }
+  })).data;
+}
 
 const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string> => {
 
@@ -172,15 +183,7 @@ const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string>
     auth: jwtCreds
   });
   
-  const today = new Date();
-
-  const spreadsheet = (await sheetsApi.spreadsheets.create({
-    resource: {
-      properties: {
-        title: `AlbionStats-${today.getFullYear()}-${today.getMonth()}-${today.getUTCDate()}-${today.getTime()}`
-      }
-    }
-  })).data;
+  const spreadsheet = await createNewSpreadsheet(sheetsApi);
 
   const input: SavageDataInput = JSON.parse(event.body);
 
