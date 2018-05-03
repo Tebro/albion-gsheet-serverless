@@ -219,10 +219,10 @@ interface CellColor {
 }
 
 interface CellRange {
-  startRowIndex: number;
-  endRowIndex: number;
-  startColumnIndex: number;
-  endColumnIndex: number;
+  startRowIndex?: number;
+  endRowIndex?: number;
+  startColumnIndex?: number;
+  endColumnIndex?: number;
 }
 
 
@@ -260,6 +260,162 @@ const setCellBackgroundAndAlignment = async (sheetsApi: Sheets,
     });
 }
 
+interface NumberFormatRange {
+  range: CellRange;
+  pattern: string;
+}
+
+const formatNumberCells = async (sheetsApi: Sheets, spreadsheetId: string, ranges: NumberFormatRange[]): Promise<any> => {
+  const mappedRequests = ranges.map(range => ({
+    repeatCell: {
+      range: {
+        sheetId: 0,
+        ...range.range
+      },
+      cell: {
+        userEnteredFormat: {
+          numberFormat: {
+            type: "NUMBER",
+            pattern: range.pattern
+          }
+        }
+      },
+      fields: "userEnteredFormat.numberFormat"
+    }
+  }));
+
+  await sheetsApi.spreadsheets.batchUpdate({
+    spreadsheetId,
+    resource: {
+      requests: mappedRequests
+    }
+  });
+}
+
+const fameFormatPattern = "#,##0";
+const ratioFormatPattern = "##0.0";
+const integerFormatPattern = "##0";
+
+const contentTablesNumberCellRanges = [
+  { // AVG Fames
+    pattern: fameFormatPattern,
+    range: {
+      startRowIndex: 2,
+      endRowIndex: 5,
+      startColumnIndex: 1,
+      endColumnIndex: 3
+    }
+  },
+  { // AVG fK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 2,
+      endRowIndex: 5,
+      startColumnIndex: 3,
+      endColumnIndex: 4
+    }
+  },
+  { // AVG Kills & Deaths
+    pattern: integerFormatPattern,
+    range: {
+      startRowIndex: 2,
+      endRowIndex: 5,
+      startColumnIndex: 4,
+      endColumnIndex: 6
+    }
+  },
+  { // AVG rK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 2,
+      endRowIndex: 5,
+      startColumnIndex: 6,
+      endColumnIndex: 7
+    }
+  },
+  { // AVG Kill Shots
+    pattern: integerFormatPattern,
+    range: {
+      startRowIndex: 2,
+      endRowIndex: 5,
+      startColumnIndex: 7,
+      endColumnIndex: 8
+    }
+  },
+  { // Members Fame
+    pattern: fameFormatPattern,
+    range: {
+      startRowIndex: 8,
+      startColumnIndex: 1,
+      endColumnIndex: 3
+    }
+  },
+  { // Members fK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 8,
+      startColumnIndex: 3,
+      endColumnIndex: 4
+    }
+  },
+  { // Members Kills & Deaths
+    pattern: integerFormatPattern,
+    range: {
+      startRowIndex: 8,
+      startColumnIndex: 4,
+      endColumnIndex: 6
+    }
+  },
+  { // Members rK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 8,
+      startColumnIndex: 6,
+      endColumnIndex: 7
+    }
+  },
+  { // Members Kill Shots
+    pattern: integerFormatPattern,
+    range: {
+      startRowIndex: 8,
+      startColumnIndex: 7,
+      endColumnIndex: 8
+    }
+  },
+  { // Solo fames
+    pattern: fameFormatPattern,
+    range: {
+      startRowIndex: 2,
+      startColumnIndex: 10,
+      endColumnIndex: 12
+    }
+  },
+  { // Solo fK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 2,
+      startColumnIndex: 12,
+      endColumnIndex: 13
+    }
+  },
+  { // Solo Kills & Deaths
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 2,
+      startColumnIndex: 13,
+      endColumnIndex: 15
+    }
+  },
+  { // Solo fK:D
+    pattern: ratioFormatPattern,
+    range: {
+      startRowIndex: 2,
+      startColumnIndex: 15,
+      endColumnIndex: 16
+    }
+  },
+];
+
 const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Promise<void> => {
   const avgHeaderRange: CellRange = {startRowIndex: 0, endRowIndex: 1, startColumnIndex: 0, endColumnIndex: 8};
   const membersHeaderRange: CellRange = {startRowIndex: 0, endRowIndex: 1, startColumnIndex: 9, endColumnIndex: 16};
@@ -281,6 +437,8 @@ const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Prom
   await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, avgHeaderWithColumnHeadersRange, avgHeaderColor, "CENTER", "MIDDLE");
   await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, membersHeaderWithColumnHeadersRange, membersHeaderColor, "CENTER", "MIDDLE");
   await setCellBackgroundAndAlignment(sheetsApi, spreadsheetId, soloHeaderWithColumnHeadersRange, soloHeaderColor, "CENTER", "MIDDLE");
+
+  await formatNumberCells(sheetsApi, spreadsheetId, contentTablesNumberCellRanges);
 
 }
 
