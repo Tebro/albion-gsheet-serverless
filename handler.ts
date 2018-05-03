@@ -169,6 +169,42 @@ const createNewSpreadsheet = async (sheetsApi: Sheets): Promise<Schema$Spreadshe
   })).data;
 }
 
+
+const mergeCells = async (sheetsApi: Sheets,
+  spreadsheetId: string,
+  startRow: number,
+  endRow: number,
+  startColumn: number,
+  endColumn: number,
+  mergeType: string): Promise<void> => {
+
+    await sheetsApi.spreadsheets.batchUpdate({
+      spreadsheetId,
+      resource: {
+        requests: [
+          {
+            mergeCells: {
+              range: {
+                sheetId: 0,
+                startRowIndex: startRow,
+                endRowIndex: endRow,
+                startColumnIndex: startColumn,
+                endColumnIndex: endColumn
+              },
+              mergeType: mergeType
+            }
+          }
+        ]
+      }
+    });
+}
+
+const formatSpreadsheet = async (sheetsApi: Sheets, spreadsheetId: string): Promise<void> => {
+  await mergeCells(sheetsApi, spreadsheetId, 0, 1, 0, 8, "MERGE_ALL");
+  await mergeCells(sheetsApi, spreadsheetId, 0, 1, 9, 16, "MERGE_ALL");
+  await mergeCells(sheetsApi, spreadsheetId, 6, 7, 0, 8, "MERGE_ALL");
+}
+
 const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string> => {
 
   const jwtCreds = await getAuthorizedJWT();
@@ -188,6 +224,8 @@ const createAndFillSpreadSheet = async (event: APIGatewayEvent): Promise<string>
   const input: SavageDataInput = JSON.parse(event.body);
 
   await insertDataToSpreadsheet(sheetsApi, spreadsheet.spreadsheetId, input);
+
+  await formatSpreadsheet(sheetsApi, spreadsheet.spreadsheetId);
 
   await setFileOwner(driveApi, spreadsheet.spreadsheetId, input.email);
 
